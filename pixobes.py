@@ -15,6 +15,7 @@ Iterate through each being, first come first served.
 
 """
 
+import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -26,11 +27,11 @@ And generates food.
 
 """
 
-class Environment:
+class Land:
     
-    def __init__(self):
-        self.height = 30
-        self.width = 30
+    def __init__(self, height = 30, width = 30):
+        self.height = height
+        self.width = width
         self.grid = np.zeros((self.height, self.width))
         
     def draw(self):
@@ -50,8 +51,8 @@ Pixobe object that governs their behaviour and evolution.
 
 class Pixobe:
     
-    def __init__(self, Environment):
-        self.E = Environment
+    def __init__(self, land):
+        self.land = land
         # Position of pixobe's head in environment
         self.location = [5,5]
         # Age in iterations lived
@@ -65,14 +66,34 @@ class Pixobe:
     
     # Redraw pixobe in Environment
     def move(self):
-        self.E.grid[self.location[0],self.location[1]] = 1
+        self.land.grid[self.location[0], self.location[1]] = 1
         
-        
+
+
+"""
+World controller
+
+"""
   
+class World:
+    
+    def __init__(self, pixobes = 5):
+        self.land = Land(50, 50)
+        self.census = pd.DataFrame({'Label': pd.Series([], dtype='int')
+                                    ,'Pixobe': pd.Series([], dtype='object')})
+        for i in range(1, pixobes+1):
+            self.census = self.census.append({'Label':i, 'Pixobe':Pixobe(self.land)}, ignore_index=True)
+        
+
+
+
 """
 Run test
 
 """
+
+W = World()
+vars(W)
 
 E = Environment()
 P = Pixobe(E)
