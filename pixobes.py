@@ -15,6 +15,10 @@ Iterate through each being, first come first served.
 
 """
 
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
 """
 And landscape object that maps all current pixobe locations.
 And produces the image.
@@ -22,6 +26,17 @@ And generates food.
 
 """
 
+class Environment:
+    
+    def __init__(self):
+        self.height = 10
+        self.width = 10
+        self.grid = np.zeros((self.height, self.width))
+        
+    def draw(self):
+        
+        # IDEA: hexbin
+        
 
 
 """
@@ -31,12 +46,57 @@ Pixobe object that governs their behaviour and evolution.
 
 class Pixobe:
     
+    def __init__(self, Environment):
+        self.E = Environment
+        # Position of pixobe's head in environment
+        self.location = [5,5]
+        # Age in iterations lived
+        self.age = 0
+        # Steps can take per cycle
+        self.speed = 1
+    
+    # You only get one attempt to step or turn per iteration
+    def step(self):
+        self.location[0] += self.speed
+    
+    # Redraw pixobe in Environment
+    def move(self):
+        self.E.grid[self.location[0],self.location[1]] = 1
+        
+        
+  
+"""
+Run test
+
+"""
+
+E = Environment()
+P = Pixobe(E)
+E.grid
+P.move()
+E.grid
+
+
+
+"""
+Pixobe development/idea area
+
+"""       
+
+class PixobeIdeas:
+    
     def __init__(self, Pixobe parent):
-        self.shape = 
-        self.speed = 
-        self.spin = 
-        self.fertility = 
-        self.life =
+        # Position of pixobe's head in environment
+        self.location = [5,5]
+        # Direction head is facing. 
+        self.orientation = 0
+        self.shape = 1
+        self.speed = 1
+        self.spin = 1
+        # Minimum cycles between reproductions
+        self.fertility = 100
+        # Maximum cycles pixobe can live
+        self.life = 1000
         self.age = 0
     
     # You only get one attempt to step or turn per iteration
