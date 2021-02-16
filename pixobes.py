@@ -32,8 +32,15 @@ Pixobe object that governs their behaviour and evolution.
 class Pixobe:
     
     def __init__(self, Pixobe parent):
+        # Larger sizes require more food
         self.shape = 
+        # Binary desire to move forward
+        self.drive = 
+        # Maximum distance can move forward in one step
         self.speed = 
+        # Binary desire to turn
+        self.stability
+        # Maximum angle can rotate in one turn
         self.spin = 
         self.fertility = 
         self.life =
@@ -41,10 +48,17 @@ class Pixobe:
     
     # You only get one attempt to step or turn per iteration
     def step(self):
+        # Random choice in [0, speed]
     def turn(self):
+        # Random choice in [-spin, +spin]
     
     # Triggered by touching food
     def feed(self):
     def breed(self):
+        # Evolutionary improvements get exponentially harder
     def die(self):
+
+
+
+
 
