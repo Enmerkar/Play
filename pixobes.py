@@ -29,14 +29,18 @@ And generates food.
 class Environment:
     
     def __init__(self):
-        self.height = 10
-        self.width = 10
+        self.height = 30
+        self.width = 30
         self.grid = np.zeros((self.height, self.width))
         
     def draw(self):
-        
+        plt.figure()
+        sns.heatmap(self.grid,
+                    square=True,
+                    xticklabels=False,
+                    yticklabels=False,
+                    cbar=False)
         # IDEA: hexbin
-        
 
 
 """
@@ -73,8 +77,17 @@ Run test
 E = Environment()
 P = Pixobe(E)
 E.grid
+E.draw()
+P.step()
 P.move()
-E.grid
+E.draw()
+
+P.step()
+P.move()
+E.draw()
+P.step()
+P.move()
+E.draw()
 
 
 
