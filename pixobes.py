@@ -19,6 +19,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+from random import randrange
 
 """
 And landscape object that maps all current pixobe locations.
@@ -29,11 +30,17 @@ And generates food.
 
 class Land:
     
-    def __init__(self, height = 30, width = 30):
+    def __init__(self, height=30, width=30):
         self.height = height
         self.width = width
         self.grid = np.zeros((self.height, self.width))
-        
+    
+    def get_height(self):
+        return self.height
+    
+    def get_width(self):
+        return self.width
+    
     def draw(self):
         plt.figure()
         sns.heatmap(self.grid,
@@ -51,14 +58,19 @@ Pixobe object that governs their behaviour and evolution.
 
 class Pixobe:
     
-    def __init__(self, land):
+    def __init__(self, land, location=False):
         self.land = land
         # Position of pixobe's head in environment
-        self.location = [5,5]
+        if location:
+            #TODO: place near parent
+        else:
+            self.location = [randrange(0,land.get_height()),
+                             randrange(0,land.get_width())]
         # Age in iterations lived
         self.age = 0
         # Steps can take per cycle
         self.speed = 1
+        
     
     # You only get one attempt to step or turn per iteration
     def step(self):
@@ -75,78 +87,19 @@ World controller
 
 """
   
-class World:
+def run(pixobes = 5, iterations = 100):
+    land = Land(50,50)
+    census = pd.DataFrame({'Label': pd.Series([], dtype='int')
+                                ,'Pixobe': pd.Series([], dtype='object')})
+    for i in range(1, pixobes+1):
+        census = census.append({'Label':i,
+                                'Pixobe':Pixobe(land, location=True)},
+                               ignore_index=True)
     
-    def __init__(self, pixobes = 5):
-        self.land = Land(50, 50)
-        self.census = pd.DataFrame({'Label': pd.Series([], dtype='int')
-                                    ,'Pixobe': pd.Series([], dtype='object')})
-        for i in range(1, pixobes+1):
-            self.census = self.census.append({'Label':i, 'Pixobe':Pixobe(self.land)}, ignore_index=True)
-        
+    land.draw()
 
+# Execute
 
-
-"""
-Run test
-
-"""
-
-W = World()
-vars(W)
-
-E = Environment()
-P = Pixobe(E)
-E.grid
-E.draw()
-P.step()
-P.move()
-E.draw()
-
-P.step()
-P.move()
-E.draw()
-P.step()
-P.move()
-E.draw()
-
-
-
-"""
-Pixobe development/idea area
-
-"""       
-
-class PixobeIdeas:
-    
-    def __init__(self, Pixobe parent):
-        # Larger sizes require more food
-        self.shape = 
-        # Binary desire to move forward
-        self.drive = 
-        # Maximum distance can move forward in one step
-        self.speed = 
-        # Binary desire to turn
-        self.stability
-        # Maximum angle can rotate in one turn
-        self.spin = 
-        self.fertility = 
-        self.life =
-        self.age = 0
-    
-    # You only get one attempt to step or turn per iteration
-    def step(self):
-        # Random choice in [0, speed]
-    def turn(self):
-        # Random choice in [-spin, +spin]
-    
-    # Triggered by touching food
-    def feed(self):
-    def breed(self):
-        # Evolutionary improvements get exponentially harder
-    def die(self):
-
-
-
+run(10)
 
 
