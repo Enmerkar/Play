@@ -7,6 +7,12 @@ https://www.goodreads.com/api
 
 Use Goodreads data to find books that I'd like based on my rated/read books.
 
+Looks like Goodreads is not issuing new developer keys. Could try Amazon:
+
+https://pypi.org/project/python-amazon-product-api/
+
+
+
 @author: JKN08.
 """
 
