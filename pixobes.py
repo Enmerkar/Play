@@ -58,23 +58,33 @@ Pixobe object that governs their behaviour and evolution.
 
 class Pixobe:
     
-    def __init__(self, land, location=False):
+    def __init__(self, land, location=True):
         self.land = land
-        # Position of pixobe's head in environment
-        if location:
-            #TODO: place near parent
-        else:
-            self.location = [randrange(0,land.get_height()),
-                             randrange(0,land.get_width())]
         # Age in iterations lived
         self.age = 0
         # Steps can take per cycle
         self.speed = 1
-        
+        # Position of pixobe's head in environment
+        if location:
+            pass
+            #TODO: place near parent
+        else:
+            # Generate random spawn locations until free space is found
+            looking = True
+            x = 0
+            y = 0
+            while looking:
+                x = randrange(0, self.land.get_height())
+                y = randrange(0, self.land.get_width())
+                looking = bool(land.grid[x, y])
+            self.location = [x, y]
+        self.land.grid[self.location[0], self.location[1]] = 1
+        self.heading = 0
     
     # You only get one attempt to step or turn per iteration
     def step(self):
-        self.location[0] += self.speed
+        if heading == 0:
+            self.location = [self.location[0], self.location[1] + self.speed]
     
     # Redraw pixobe in Environment
     def move(self):
@@ -93,13 +103,27 @@ def run(pixobes = 5, iterations = 100):
                                 ,'Pixobe': pd.Series([], dtype='object')})
     for i in range(1, pixobes+1):
         census = census.append({'Label':i,
-                                'Pixobe':Pixobe(land, location=True)},
+                                'Pixobe':Pixobe(land, location=False)},
                                ignore_index=True)
     
     land.draw()
+    
+    for i, row in census.iterrows():
+        pixobe = row[1]
+        pixobe.move()
+        
+    land.draw()
+    
+    
 
 # Execute
 
 run(10)
+
+df = pd.DataFrame(a)
+
+for i, row in df.iterrows():
+    print(row[[1]])
+
 
 
