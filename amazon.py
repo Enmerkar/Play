@@ -13,8 +13,8 @@ Use Amazon data to test models.
 """
 
 # AWS Developer Info
-AMAZON_ACCESS_KEY = 'AKIAIIG6XH2HGM7WH4OQ'
-AMAZON_SECRET_KEY = '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'
+AMAZON_ACCESS_KEY = ''
+AMAZON_SECRET_KEY = ''
 # Business recipient of online traffic payments
 AMAZON_ASSOC_TAG = 'findelworks-22'
 AMAZON_COUNTRY = 'AU'
