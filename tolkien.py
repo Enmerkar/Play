@@ -12,7 +12,7 @@ Could even try blends: e.g. Tolkien + Dan Brown.
 """
 
 # Read Ubuntu
-hobbit = open('/home/justin/Downloads/hobbit.txt')
+hobbit = open('data.txt')
 fellowship_ring = open('/home/justin/Downloads/fellowship_ring.txt')
 two_towers = open('/home/justin/Downloads/two_towers.txt')
 return_king = open('/home/justin/Downloads/return_king.txt')
@@ -25,7 +25,7 @@ return_king = open('/Users/justinknife@qantas.com.au/Documents/return_king.txt')
 
 # Clean the hobbit
 # Or
-with open('/home/justin/Downloads/hobbit.txt') as hobbit:
+with open('/home/justin/Play/data.txt') as hobbit:
     hobbit_lines = hobbit.readlines()
 
 hobbit_lines_filtered = list(filter(lambda x: x!='\n', hobbit_lines))
@@ -53,7 +53,7 @@ nlp_en.pipeline
 
 hobbit_doc
 
-# TF-IDF
+# TF-IDF and Text Classification
 
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
@@ -87,11 +87,28 @@ X_train_counts = count_vect.fit_transform(X_train)
 X_train.shape
 X_train_counts.shape
 
+from sklearn.svm import LinearSVC
+from sklearn.pipeline import Pipeline
 
+text_clf = Pipeline([('tfidf', TfidfVectorizer()), ('clf', LinearSVC())])
 
+text_clf.fit(X_train, y_train)
 
+predictions = text_clf.predict(X_test)
 
+from sklearn.metrics import confusion_matrix, classification_report, accuracy_score
 
+print(confusion_matrix(y_test, predictions))
+
+print(classification_report(y_test, predictions))
+
+accuracy_score(y_test, predictions)
+
+text_clf.predict(['Bywater','Troll','Mirkwood','Smaug','Zelda','Horse'])
+
+# Semantics and Sentiment Analysis
+
+nlp_en_lg = spacy.load('en_core_web_lg')
 
 
 
