@@ -110,10 +110,32 @@ text_clf.predict(['Bywater','Troll','Mirkwood','Smaug','Zelda','Horse'])
 
 nlp_en_lg = spacy.load('en_core_web_lg')
 
+nlp_en_lg.vocab.vectors.shape
 
+tokens = nlp_en_lg(u'lion cat pet')
+for token1 in tokens:
+    for token2 in tokens:
+        print(token1.text, token2.text, token1.similarity(token2))
+        
+tokens = nlp_en_lg(u'Gandalf is a powerful wizard from Hobbiton in the Shire.')
+for token in tokens:
+    print(f'{token.text:<10}', f'{token.has_vector:<10}', f'{token.vector_norm:<20}', f'{token.is_oov:<10}')
 
+from scipy import spatial
 
+cosine_similarity = lambda vec1, vec2: 1 - spatial.distance.cosine(vec1, vec2)
 
+wizard = nlp_en_lg.vocab['wizard'].vector
+Tolkien = nlp_en_lg.vocab['Tolkien'].vector
+new_word = wizard + Tolkien
+
+matches = []
+for word in nlp_en_lg.vocab:
+    if word.has_vector:
+        matches.append((word, cosine_similarity(new_word, word.vector)))
+
+matches_sorted = sorted(matches, key=lambda item:-item[1])
+print([t[0].text for t in matches_sorted[:10]])
 
 
 
