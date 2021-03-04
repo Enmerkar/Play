@@ -40,8 +40,6 @@ hobbit_string = ' '.join(hobbit_clean)
 import spacy
 nlp_en = spacy.load('en_core_web_sm')
 
-#hobbit_utf = hobbit_string.encode(encoding='UTF-8', errors='strict')
-
 hobbit_doc = nlp_en(hobbit_string)
 
 doc_en = nlp_en(u'My name is Justin and I am a human who likes eating various foodstuffs.')
@@ -51,7 +49,11 @@ for token in doc_en:
     
 nlp_en.pipeline
 
-hobbit_doc
+hobbit_vocab = [token.lemma_.lower() for token in hobbit_doc if not token.is_stop and token.is_alpha]
+hobbit_vocab_df = pd.DataFrame(hobbit_vocab)
+hobbit_vocab_df.columns = ['Word']
+hobbit_vocab_count = hobbit_vocab_df['Word'].value_counts()
+hobbit_vocab_count.head()
 
 # TF-IDF and Text Classification
 
@@ -106,7 +108,7 @@ accuracy_score(y_test, predictions)
 
 text_clf.predict(['Bywater','Troll','Mirkwood','Smaug','Zelda','Horse'])
 
-# Semantics and Sentiment Analysis
+# Semantics
 
 nlp_en_lg = spacy.load('en_core_web_lg')
 
@@ -137,8 +139,26 @@ for word in nlp_en_lg.vocab:
 matches_sorted = sorted(matches, key=lambda item:-item[1])
 print([t[0].text for t in matches_sorted[:10]])
 
+# Sentiment Analysis
 
+import nltk
+nltk.download('vader_lexicon')
 
+from nltk.sentiment.vader import SentimentIntensityAnalyzer
+
+sid = SentimentIntensityAnalyzer()
+
+a = 'This is a good movie.'
+sid.polarity_scores(a)
+
+b = 'This movie fucking SUCKS!!'
+sid.polarity_scores(b)
+
+hobbit_df['Chapter'].value_counts()
+
+hobbit_df['Sentiment'] = hobbit_df['Text'].apply(lambda text: sid.polarity_scores(text)['compound'])
+
+hobbit_df.groupby('Chapter').sum('Sentiment')
 
 
 
