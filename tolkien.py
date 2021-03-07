@@ -154,11 +154,23 @@ sid.polarity_scores(a)
 b = 'This movie fucking SUCKS!!'
 sid.polarity_scores(b)
 
-hobbit_df['Chapter'].value_counts()
-
 hobbit_df['Sentiment'] = hobbit_df['Text'].apply(lambda text: sid.polarity_scores(text)['compound'])
 
 hobbit_df.groupby('Chapter').sum('Sentiment')
+
+# Topic Modelling
+
+cv = CountVectorizer(max_df=0.9, min_df=2, stop_words='english')
+hobbit_dtm = cv.fit_transform(hobbit_clean)
+
+from sklearn.decomposition import LatentDirichletAllocation
+
+LDA = LatentDirichletAllocation(n_components=7, random_state=42)
+
+LDA.fit(hobbit_dtm)
+
+
+
 
 
 
