@@ -163,11 +163,33 @@ hobbit_df.groupby('Chapter').sum('Sentiment')
 cv = CountVectorizer(max_df=0.9, min_df=2, stop_words='english')
 hobbit_dtm = cv.fit_transform(hobbit_clean)
 
+vocab = cv.get_feature_names()
+
 from sklearn.decomposition import LatentDirichletAllocation
 
 LDA = LatentDirichletAllocation(n_components=7, random_state=42)
-
 LDA.fit(hobbit_dtm)
+
+LDA.components_.shape
+
+first_topic = LDA.components_[0]
+top_words = first_topic.argsort()[-20:]
+bottom_words = first_topic.argsort()[:10]
+
+for i in top_words:
+    print(vocab[i])
+
+for i in bottom_words:
+    print(vocab[i])
+
+for i, topic in enumerate(LDA.components_):
+    print([vocab[j] for j in topic.argsort()[-10:]])
+
+topic_results = LDA.transform(hobbit_dtm)
+
+topic_results.shape
+
+
 
 
 
