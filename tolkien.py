@@ -173,21 +173,35 @@ LDA.fit(hobbit_dtm)
 LDA.components_.shape
 
 first_topic = LDA.components_[0]
-top_words = first_topic.argsort()[-20:]
-bottom_words = first_topic.argsort()[:10]
 
-for i in top_words:
-    print(vocab[i])
-
-for i in bottom_words:
-    print(vocab[i])
-
+# list top probabilities for each topic
 for i, topic in enumerate(LDA.components_):
     print([vocab[j] for j in topic.argsort()[-10:]])
 
 topic_results = LDA.transform(hobbit_dtm)
 
 topic_results.shape
+
+# Non-Negative Matrix Factorisation
+
+hobbit_1_df = hobbit_df[hobbit_df['Chapter']==1]['Text'][2:]
+
+cv = CountVectorizer(max_df=0.95, min_df=2, stop_words='english')
+hobbit_1_dtm = cv.fit_transform(hobbit_1_df)
+vocab = cv.get_feature_names()
+
+from sklearn.decomposition import NMF
+
+nmf_model = NMF(n_components=5, random_state=42)
+nmf_model.fit(hobbit_1_dtm)
+
+# list top coefficients for each topic
+for i, topic in enumerate(nmf_model.components_):
+    print([vocab[j] for j in topic.argsort()[-10:]])
+
+topic_results = nmf_model.transform(hobbit_1_dtm)
+hobbit_1_df['Topic'] = topic_results.argmax(axis=1)
+
 
 
 
