@@ -202,7 +202,19 @@ for i, topic in enumerate(nmf_model.components_):
 topic_results = nmf_model.transform(hobbit_1_dtm)
 hobbit_1_df['Topic'] = topic_results.argmax(axis=1)
 
+# Text Generation
 
+hobbit_str = ''
+for line in hobbit_clean:
+    hobbit_str += line.replace('\n',' ')
+
+from keras.model import load_model
+from sklearn.metrics import confusion_matrix, classification_report, accuracy_score
+
+nlp = spacy.load('en_core_web_lg', disable=['parser','tagger', 'ner'])
+
+def separate_punct(doc):
+    return [token.text.lower() for token in nlp(doc) if token.text not in '\\n\\n \\n\\n\\n!\"-#$%&()--.*+,-/:;<=>?@[\\\\]^_`{|}~\\t\\n ']
 
 
 
