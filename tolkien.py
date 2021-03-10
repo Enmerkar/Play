@@ -208,17 +208,36 @@ hobbit_str = ''
 for line in hobbit_clean:
     hobbit_str += line.replace('\n',' ')
 
-from keras.model import load_model
-from sklearn.metrics import confusion_matrix, classification_report, accuracy_score
-
 nlp = spacy.load('en_core_web_lg', disable=['parser','tagger', 'ner'])
+nlp.max_length = 100000
 
 def separate_punct(doc):
     return [token.text.lower() for token in nlp(doc) if token.text not in '\\n\\n \\n\\n\\n!\"-#$%&()--.*+,-/:;<=>?@[\\\\]^_`{|}~\\t\\n ']
 
+tokens = separate_punct(hobbit_str[0:nlp.max_length])
+
+train_len = 20 + 1
+text_sequences = []
+
+for i in range(train_len, len(tokens)):
+    seq = tokens[i-train_len:i]
+    text_sequences.append(seq)
+
+from keras.preprocessing.text import Tokenizer
+
+tokenizer = Tokenizer()
+tokenizer.fit_on_texts(text_sequences)
+sequences = tokenizer.texts_to_sequences(text_sequences)
+
+tokenizer.index_word
+tokenizer.word_counts
 
 
 
+
+
+from keras.model import load_model
+from sklearn.metrics import confusion_matrix, classification_report, accuracy_score
 
 
 
