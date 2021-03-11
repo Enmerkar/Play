@@ -11,20 +11,7 @@ Could even try blends: e.g. Tolkien + Dan Brown.
 @author: JKN08.
 """
 
-# Read Ubuntu
-hobbit = open('data.txt')
-fellowship_ring = open('/home/justin/Downloads/fellowship_ring.txt')
-two_towers = open('/home/justin/Downloads/two_towers.txt')
-return_king = open('/home/justin/Downloads/return_king.txt')
-
-# Read Mac
-hobbit = open('/Users/justinknife@qantas.com.au/Documents/hobbit.txt')
-fellowship_ring = open('/Users/justinknife@qantas.com.au/Documents/fellowship_ring.txt')
-two_towers = open('/Users/justinknife@qantas.com.au/Documents/two_towers.txt')
-return_king = open('/Users/justinknife@qantas.com.au/Documents/return_king.txt')
-
 # Clean the hobbit
-# Or
 with open('/home/justin/Play/data.txt') as hobbit:
     hobbit_lines = hobbit.readlines()
 
@@ -209,7 +196,7 @@ for line in hobbit_clean:
     hobbit_str += line.replace('\n',' ')
 
 nlp = spacy.load('en_core_web_lg', disable=['parser','tagger', 'ner'])
-nlp.max_length = 100000
+nlp.max_length = 200000
 
 def separate_punct(doc):
     return [token.text.lower() for token in nlp(doc) if token.text not in '\\n\\n \\n\\n\\n!\"-#$%&()--.*+,-/:;<=>?@[\\\\]^_`{|}~\\t\\n ']
@@ -223,21 +210,46 @@ for i in range(train_len, len(tokens)):
     seq = tokens[i-train_len:i]
     text_sequences.append(seq)
 
+import numpy as np
 from keras.preprocessing.text import Tokenizer
 
 tokenizer = Tokenizer()
 tokenizer.fit_on_texts(text_sequences)
-sequences = tokenizer.texts_to_sequences(text_sequences)
+sequences = np.array(tokenizer.texts_to_sequences(text_sequences))
 
-tokenizer.index_word
+vocab_size = len(tokenizer.index_word)
 tokenizer.word_counts
 
+from keras.utils import to_categorical
+
+X = sequences[:,:-1]
+y = to_categorical(sequences[:,-1], num_classes=vocab_size+1)
+
+seq_len = X.shape[1]
+
+from keras.models import Sequential
+from keras.layers import Dense, LSTM, Embedding
+
+def create_model(vocab_size, seq_len):
+    model = Sequential()
+    model.add(Embedding(vocab_size, seq_len, input_length=seq_len))
+    model.add(LSTM(seq_len*3, return_sequences=True))
+    model.add(LSTM(seq_len*3))
+    model.add(Dense(seq_len*2, activation='relu'))
+    model.add(Dense(vocab_size, activation='softmax'))
+    model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+    model.summary()
+    return model
+
+model = create_model(vocab_size+1, seq_len)
+model.fit(X, y, batch_size=128, epochs=100, verbose=2)
+
+from pickle import dump
+
+model.save('hobbit.h5')
+dump(tokenizer, open('hobbit_tokenizer', 'wb'))
 
 
-
-
-from keras.model import load_model
-from sklearn.metrics import confusion_matrix, classification_report, accuracy_score
 
 
 
