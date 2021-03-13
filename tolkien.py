@@ -196,14 +196,14 @@ for line in hobbit_clean:
     hobbit_str += line.replace('\n',' ')
 
 nlp = spacy.load('en_core_web_lg', disable=['parser','tagger', 'ner'])
-nlp.max_length = 200000
+nlp.max_length = 300000
 
 def separate_punct(doc):
     return [token.text.lower() for token in nlp(doc) if token.text not in '\\n\\n \\n\\n\\n!\"-#$%&()--.*+,-/:;<=>?@[\\\\]^_`{|}~\\t\\n ']
 
 tokens = separate_punct(hobbit_str[0:nlp.max_length])
 
-train_len = 20 + 1
+train_len = 30 + 1
 text_sequences = []
 
 for i in range(train_len, len(tokens)):
@@ -233,7 +233,7 @@ from keras.layers import Dense, LSTM, Embedding
 def create_model(vocab_size, seq_len):
     model = Sequential()
     model.add(Embedding(vocab_size, seq_len, input_length=seq_len))
-    model.add(LSTM(seq_len*3, return_sequences=True))
+    model.add(LSTM(seq_len*2, return_sequences=True))
     model.add(LSTM(seq_len*3))
     model.add(Dense(seq_len*2, activation='relu'))
     model.add(Dense(vocab_size, activation='softmax'))
@@ -242,12 +242,48 @@ def create_model(vocab_size, seq_len):
     return model
 
 model = create_model(vocab_size+1, seq_len)
-model.fit(X, y, batch_size=128, epochs=100, verbose=2)
+model.fit(X, y, batch_size=128, epochs=50, verbose=2)
 
 from pickle import dump
 
-model.save('hobbit.h5')
-dump(tokenizer, open('hobbit_tokenizer', 'wb'))
+model.save('hobbit_a.h5')
+dump(tokenizer, open('hobbit_tokenizer_a', 'wb'))
+
+from keras.preprocessing.sequence import pad_sequences
+
+def generate_text(model, tokenizer, seq_len, seed_text, num_gen_words):
+    output_text = []
+    input_text = seed_text
+    for i in range(num_gen_words):
+        encoded_text = tokenizer.texts_to_sequences([input_text])[0]
+        pad_encoded = pad_sequences([encoded_text], maxlen=seq_len, truncating='pre')
+        pred_word_index = model.predict_classes(pad_encoded, verbose=0)[0]
+        pred_word = tokenizer.index_word[pred_word_index]
+        input_text += ' ' + pred_word
+        output_text.append(pred_word)
+    return ' '.join(output_text)
+
+seed_text = 'The lonely band marched towards the distant hills stopping once to take a drink from the crystal river the July sun was'
+hobbit_gen_text = generate_text(model, tokenizer, 20, seed_text, 50)
+
+from kera.models import load_model
+
+model = load_model('hobbit.h5')
+tokenizer = load(open('hobbit_tokenizer', 'rb'))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
