@@ -196,14 +196,14 @@ for line in hobbit_clean:
     hobbit_str += line.replace('\n',' ')
 
 nlp = spacy.load('en_core_web_lg', disable=['parser','tagger', 'ner'])
-nlp.max_length = 300000
+nlp.max_length = 200000
 
 def separate_punct(doc):
     return [token.text.lower() for token in nlp(doc) if token.text not in '\\n\\n \\n\\n\\n!\"-#$%&()--.*+,-/:;<=>?@[\\\\]^_`{|}~\\t\\n ']
 
 tokens = separate_punct(hobbit_str[0:nlp.max_length])
 
-train_len = 30 + 1
+train_len = 25 + 1
 text_sequences = []
 
 for i in range(train_len, len(tokens)):
@@ -234,7 +234,7 @@ def create_model(vocab_size, seq_len):
     model = Sequential()
     model.add(Embedding(vocab_size, seq_len, input_length=seq_len))
     model.add(LSTM(seq_len*2, return_sequences=True))
-    model.add(LSTM(seq_len*3))
+    model.add(LSTM(seq_len*2))
     model.add(Dense(seq_len*2, activation='relu'))
     model.add(Dense(vocab_size, activation='softmax'))
     model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
@@ -242,12 +242,12 @@ def create_model(vocab_size, seq_len):
     return model
 
 model = create_model(vocab_size+1, seq_len)
-model.fit(X, y, batch_size=128, epochs=50, verbose=2)
+model.fit(X, y, batch_size=128, epochs=20, verbose=2)
 
-from pickle import dump
+from pickle import dump, load
 
-model.save('hobbit_a.h5')
-dump(tokenizer, open('hobbit_tokenizer_a', 'wb'))
+model.save('hobbit_b.h5')
+dump(tokenizer, open('hobbit_tokenizer_b', 'wb'))
 
 from keras.preprocessing.sequence import pad_sequences
 
@@ -266,15 +266,23 @@ def generate_text(model, tokenizer, seq_len, seed_text, num_gen_words):
 seed_text = 'The lonely band marched towards the distant hills stopping once to take a drink from the crystal river the July sun was'
 hobbit_gen_text = generate_text(model, tokenizer, 20, seed_text, 50)
 
-from kera.models import load_model
+from keras.models import load_model
 
-model = load_model('hobbit.h5')
-tokenizer = load(open('hobbit_tokenizer', 'rb'))
+model = load_model('hobbit_c.h5')
+tokenizer = load(open('hobbit_tokenizer_b', 'rb'))
 
+model.fit(X, y, batch_size=128, epochs=20, verbose=2)
+model.save('hobbit_c.h5')
 
+# Chat Bot
 
+with open("/home/justin/Downloads/UPDATED_NLP_COURSE/06-Deep-Learning/train_qa.txt", "rb") as fp:
+    train_data =  load(fp)
 
+with open("/home/justin/Downloads/UPDATED_NLP_COURSE/06-Deep-Learning/test_qa.txt", "rb") as fp:
+    test_data =  load(fp)
 
+train_data[0] # Story, Question, Answer
 
 
 
