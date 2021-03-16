@@ -271,7 +271,7 @@ from keras.models import load_model
 model = load_model('hobbit_c.h5')
 tokenizer = load(open('hobbit_tokenizer_b', 'rb'))
 
-model.fit(X, y, batch_size=128, epochs=20, verbose=2)
+model.fit(X, y, batch_size=128, epochs=40, verbose=2)
 model.save('hobbit_c.h5')
 
 # Chat Bot
@@ -284,9 +284,70 @@ with open("/home/justin/Downloads/UPDATED_NLP_COURSE/06-Deep-Learning/test_qa.tx
 
 train_data[0] # Story, Question, Answer
 
+##########################
+##########################
+##########################
 
+with open('/home/justin/Play/data.txt') as hobbit:
+    hobbit_lines = hobbit.readlines()
 
+hobbit_lines_filtered = list(filter(lambda x: x!='\n', hobbit_lines))
+hobbit_lines_filtered = hobbit_lines_filtered[59:1937]
+chapter_index = [i for i, x in enumerate(hobbit_lines_filtered) if x.startswith('Chapter ')]
+chapter_head = chapter_index + [i+1 for i in chapter_index]
+keep_lines = set([*range(len(hobbit_lines_filtered))])
+keep_lines -= set(chapter_head)
+hobbit_clean = [line for i, line in enumerate(hobbit_lines_filtered) if i in keep_lines]
+hobbit_string = ' '.join(hobbit_clean)
 
+import spacy
+
+hobbit_str = ''
+for line in hobbit_clean:
+    hobbit_str += line.replace('\n',' ')
+
+nlp = spacy.load('en_core_web_lg', disable=['parser','tagger', 'ner'])
+nlp.max_length = 200000
+
+def separate_punct(doc):
+    return [token.text.lower() for token in nlp(doc) if token.text not in '\\n\\n \\n\\n\\n!\"-#$%&()--.*+,-/:;<=>?@[\\\\]^_`{|}~\\t\\n ']
+
+tokens = separate_punct(hobbit_str[0:nlp.max_length])
+
+train_len = 25 + 1
+text_sequences = []
+
+for i in range(train_len, len(tokens)):
+    seq = tokens[i-train_len:i]
+    text_sequences.append(seq)
+
+import numpy as np
+from keras.preprocessing.text import Tokenizer
+
+from pickle import dump, load
+
+from keras.models import load_model
+
+model = load_model('hobbit_c.h5')
+tokenizer = load(open('hobbit_tokenizer_b', 'rb'))
+
+sequences = np.array(tokenizer.texts_to_sequences(text_sequences))
+
+vocab_size = len(tokenizer.index_word)
+tokenizer.word_counts
+
+from keras.utils import to_categorical
+
+X = sequences[:,:-1]
+y = to_categorical(sequences[:,-1], num_classes=vocab_size+1)
+
+seq_len = X.shape[1]
+
+from keras.models import Sequential
+from keras.layers import Dense, LSTM, Embedding
+
+model.fit(X, y, batch_size=128, epochs=40, verbose=2)
+model.save('hobbit_c.h5')
 
 
 
