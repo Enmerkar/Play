@@ -347,6 +347,7 @@ from keras.models import Sequential
 from keras.layers import Dense, LSTM, Embedding
 
 model.fit(X, y, batch_size=128, epochs=40, verbose=2)
+
 model.save('hobbit_c.h5')
 
 
